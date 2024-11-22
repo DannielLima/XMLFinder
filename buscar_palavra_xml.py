@@ -2,10 +2,6 @@ import os
 import xml.etree.ElementTree as ET
 
 def buscar_palavra_no_xml(caminho_arquivo, palavra):
-    """
-    Busca uma palavra em qualquer parte de um arquivo XML (tags ou conteúdo).
-    Retorna True se a palavra for encontrada.
-    """
     try:
         tree = ET.parse(caminho_arquivo)
         root = tree.getroot()
@@ -21,10 +17,6 @@ def buscar_palavra_no_xml(caminho_arquivo, palavra):
 
 
 def analisar_pasta(pasta, palavra):
-    """
-    Analisa todos os arquivos XML em uma pasta e busca pela palavra.
-    Retorna uma lista com os arquivos que contêm a palavra.
-    """
     arquivos_encontrados = []
 
     for arquivo in os.listdir(pasta):
@@ -37,7 +29,7 @@ def analisar_pasta(pasta, palavra):
 
 
 # Configurações
-pasta_xmls = "C:/Users/Danniel O Brabo/Desktop/GUIMARAES XML/ERRADOS"  # Pasta onde estão os arquivos XML
+pasta_xmls = "Caminho/Para/Pasta"  # Pasta onde estão os arquivos XML
 palavra_buscar = input("Digite a palavra para buscar nos arquivos XML: ")
 
 # Processar
