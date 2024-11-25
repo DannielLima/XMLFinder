@@ -1,44 +1,45 @@
 import os
 import xml.etree.ElementTree as ET
 
-def buscar_palavra_no_xml(caminho_arquivo, palavra):
-    try:
-        tree = ET.parse(caminho_arquivo)
-        root = tree.getroot()
-        palavra_lower = palavra.lower()
+def buscar_palavra_em_tag_xml(palavra, tag, caminho_pasta):
+    resultados = {}
 
-        # Verifica em todas as tags e textos
-        for elemento in root.iter():
-            if palavra_lower in (elemento.tag.lower() or '') or palavra_lower in (elemento.text or '').lower():
-                return True
-    except Exception as e:
-        print(f"Erro ao processar {caminho_arquivo}: {e}")
-    return False
+    # Itera por todos os arquivos na pasta
+    for arquivo in os.listdir(caminho_pasta):
+        if arquivo.endswith('.xml'):  # Verifica se o arquivo é XML
+            caminho_arquivo = os.path.join(caminho_pasta, arquivo)
+            try:
+                # Carrega e parseia o arquivo XML
+                tree = ET.parse(caminho_arquivo)
+                root = tree.getroot()
+
+                # Busca a palavra dentro das tags específicas
+                matches = []
+                for elem in root.iter(tag):
+                    if palavra.lower() in (elem.text or '').lower():
+                        matches.append(elem.tag)
+
+                if matches:
+                    resultados[arquivo] = matches
+
+            except ET.ParseError:
+                print(f"Erro ao processar o arquivo {arquivo}. Verifique se ele é um XML válido.")
+
+    return resultados
 
 
-def analisar_pasta(pasta, palavra):
-    arquivos_encontrados = []
+# Exemplo de uso
+if __name__ == "__main__":
+    palavra_para_buscar = input("Digite a palavra que deseja buscar: ")
+    tag_especifica = input("Digite a tag XML onde deseja buscar: ")
+    pasta_xmls = input("Digite o caminho para a pasta com os arquivos XML: ")
 
-    for arquivo in os.listdir(pasta):
-        caminho_arquivo = os.path.join(pasta, arquivo)
-        if os.path.isfile(caminho_arquivo) and arquivo.endswith('.xml'):
-            if buscar_palavra_no_xml(caminho_arquivo, palavra):
-                arquivos_encontrados.append(arquivo)
+    resultados_busca = buscar_palavra_em_tag_xml(palavra_para_buscar, tag_especifica, pasta_xmls)
 
-    return arquivos_encontrados
-
-
-# Configurações
-pasta_xmls = "Caminho/Para/Pasta"  # Pasta onde estão os arquivos XML
-palavra_buscar = input("Digite a palavra para buscar nos arquivos XML: ")
-
-# Processar
-arquivos_com_palavra = analisar_pasta(pasta_xmls, palavra_buscar)
-
-# Resultado
-if arquivos_com_palavra:
-    print("\nArquivos que contêm a palavra:")
-    for arquivo in arquivos_com_palavra:
-        print(f"- {arquivo}")
-else:
-    print("\nNenhum arquivo contém a palavra buscada.")
+    if resultados_busca:
+        print("\nResultados encontrados:")
+        for arquivo, elementos in resultados_busca.items():
+            print(f"- Arquivo: {arquivo}")
+            print(f"  Tag onde '{palavra_para_buscar}' foi encontrada: {', '.join(elementos)}")
+    else:
+        print("Nenhuma ocorrência encontrada.")
